@@ -17,21 +17,47 @@ session.headers.update({
     "Origin": "https://flow.team",
 })
 
+# 메인 페이지 먼저 접속 (쿠키 획득)
+session.get("https://flow.team/member/loginMain.act")
+
 print("로그인 중...")
 login_payload = {
     "_JSON_": json.dumps({
         "USER_ID": EMAIL,
         "USER_PW": PASSWORD,
         "AUTO_LOGIN_YN": "N",
-        "LOGIN_GB": "01"
+        "LOGIN_GB": "01",
+        "SAVE_ID_YN": "N"
     })
 }
-res = session.post("https://flow.team/member/MEMBER_LOGIN_P001.jct", data=login_payload)
-result = res.json()
-print(f"로그인 결과: {result.get('COMMON_HEAD', {}).get('MESSAGE', '')}")
 
-if result.get('COMMON_HEAD', {}).get('ERROR'):
-    raise Exception("로그인 실패!")
+# 로그인 URL 시도
+login_urls = [
+    "https://flow.team/member/MEMBER_LOGIN_P001.jct",
+    "https://flow.team/MEMBER_LOGIN_P001.jct",
+    "https://flow.team/member/loginAction.act",
+]
+
+result = None
+for url in login_urls:
+    try:
+        res = session.post(url, data=login_payload)
+        print(f"시도: {url} → {res.status_code}")
+        if res.status_code == 200:
+            try:
+                result = res.json()
+                msg = result.get('COMMON_HEAD', {}).get('MESSAGE', '')
+                print(f"응답: {msg}")
+                if not result.get('COMMON_HEAD', {}).get('ERROR'):
+                    print("로그인 성공!")
+                    break
+            except:
+                print(f"JSON 파싱 실패: {res.text[:100]}")
+    except Exception as e:
+        print(f"에러: {e}")
+
+if not result or result.get('COMMON_HEAD', {}).get('ERROR'):
+    raise Exception("모든 로그인 URL 실패!")
 
 rgsn_dttm = result.get('RGSN_DTTM', '')
 rgsr_nm = result.get('USER_NM', '')
