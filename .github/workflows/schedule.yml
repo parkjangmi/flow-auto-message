@@ -22,7 +22,7 @@ jobs:
           FLOW_EMAIL: ${{ secrets.FLOW_EMAIL }}
           FLOW_PASSWORD: ${{ secrets.FLOW_PASSWORD }}
           FLOW_ROOM_SRNO: "22912778"
-          FLOW_MESSAGE: "현장사진들은 꼭 올려주세요"
+          FLOW_MESSAGE: "테스트123"
         run: python send_message.py
 
       - name: 오후 4시 메시지
@@ -31,5 +31,5 @@ jobs:
           FLOW_EMAIL: ${{ secrets.FLOW_EMAIL }}
           FLOW_PASSWORD: ${{ secrets.FLOW_PASSWORD }}
           FLOW_ROOM_SRNO: "22912778"
-          FLOW_MESSAGE: "스프레드시트 체크 부탁 드려요"
+          FLOW_MESSAGE: "test123test123"
         run: python send_message.py
